@@ -9,7 +9,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use pallet_grandpa::AuthorityId as GrandpaId;
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_core::{crypto::KeyTypeId, Get, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
@@ -25,7 +25,9 @@ use sp_version::RuntimeVersion;
 
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
-	construct_runtime, parameter_types,
+	construct_runtime,
+	instances::Instance1,
+	parameter_types,
 	traits::{
 		ConstBool, ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness,
 		StorageInfo,
@@ -48,6 +50,8 @@ pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
 pub use pallet_template;
+
+pub use pallet_erc_20;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -274,6 +278,40 @@ impl pallet_template::Config for Runtime {
 	type WeightInfo = pallet_template::weights::SubstrateWeight<Runtime>;
 }
 
+macro_rules! str_getter {
+	($id: ident, $val: expr) => {
+		pub struct $id;
+
+		impl Get<&'static str> for $id {
+			fn get() -> &'static str {
+				$val
+			}
+		}
+	};
+}
+
+str_getter!(Erc20Name, "token name");
+str_getter!(Erc20Symbol, "TS");
+
+impl pallet_erc_20::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = pallet_erc_20::weights::WeightInfo<Runtime>;
+	type Name = Erc20Name;
+	type Symbol = Erc20Symbol;
+	type Decimals = ConstU8<18>;
+}
+
+str_getter!(Erc20Name1, "another token");
+str_getter!(Erc20Symbol1, "RS");
+
+impl pallet_erc_20::Config<Instance1> for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = pallet_erc_20::weights::WeightInfo<Runtime>;
+	type Name = Erc20Name1;
+	type Symbol = Erc20Symbol1;
+	type Decimals = ConstU8<18>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub struct Runtime {
@@ -286,6 +324,8 @@ construct_runtime!(
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
+		Erc20: pallet_erc_20,
+		Erc20AnotherInstance: pallet_erc_20::<Instance1>,
 	}
 );
 
@@ -334,6 +374,7 @@ mod benches {
 		[pallet_timestamp, Timestamp]
 		[pallet_sudo, Sudo]
 		[pallet_template, TemplateModule]
+		[pallet_erc_20, Erc20]
 	);
 }
 

@@ -1,11 +1,11 @@
 use node_template_runtime::{
-	AccountId, AuraConfig, BalancesConfig, GrandpaConfig, RuntimeGenesisConfig, Signature,
-	SudoConfig, SystemConfig, WASM_BINARY,
+	AccountId, AuraConfig, BalancesConfig, Erc20Config, Erc20AnotherInstanceConfig, GrandpaConfig, RuntimeGenesisConfig,
+	Signature, SudoConfig, SystemConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{sr25519, Pair, Public};
+use sp_core::{sr25519, Pair, Public, U256};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 // The URL for the telemetry server.
@@ -154,5 +154,13 @@ fn testnet_genesis(
 			key: Some(root_key),
 		},
 		transaction_payment: Default::default(),
+		erc_20: Erc20Config {
+			balances: endowed_accounts.iter().cloned().map(|k| (k, U256::from(100_000))).collect(),
+			..Default::default()
+		},
+		erc_20_another_instance: Erc20AnotherInstanceConfig {
+			balances: endowed_accounts.iter().cloned().map(|k| (k, U256::from(50_000))).collect(),
+			..Default::default()
+		},
 	}
 }

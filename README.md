@@ -1,4 +1,54 @@
-# Substrate Node Template
+# Substrate Erc20 pallet
+
+Implementation of [Erc20 specification](https://eips.ethereum.org/EIPS/eip-20) with [openzeppelin's implementation](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol) as a reference.
+
+The template is based on [substrate-node-template repo](https://github.com/substrate-developer-hub/substrate-node-template) and basic instructions how to install required packages and run the node itself might be found in the original README below.
+
+## Source code
+
+The most important code of the implementation resides in `pallets/erc-20` dir. Additionally you can find the example setup code in the `runtime/src/lib.rs` and `node/src/chain_spec.rs` files.
+
+## Tests
+
+To run tests execute
+
+```sh
+cargo test
+```
+
+## Benchmarks
+
+First, build the benchmark's code with
+
+```sh
+cargo build --package node-template --release --features runtime-benchmarks
+```
+
+Then, run the built binary to update pallet's weights file based on benchmark:
+
+```sh
+./target/release/node-template benchmark pallet --chain dev --wasm-execution compiled --pallet pallet_erc_20 --extrinsic "*" --steps 50 --repeat 20 --output pallets/erc-20/src/weights.rs
+```
+
+## Manual testing
+
+Build the node binary with
+
+```sh
+cargo build --package node-template --release
+```
+
+Run the node itself
+
+```sh
+./target/release/node-template --dev
+```
+
+Go to the [polkadot apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944) and explore the chain state and make extrinsic calls for the `erc20` or `erc20AnotherInstance` namespaces
+
+<!-- Original README below -->
+
+## Substrate Node Template
 
 A fresh [Substrate](https://substrate.io/) node, ready for hacking :rocket:
 

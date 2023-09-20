@@ -1,0 +1,5 @@
+{
+  "conventionalCommits.scopes": [
+    "pallets/erc-20"
+  ]
+}
